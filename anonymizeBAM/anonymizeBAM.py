@@ -8,9 +8,10 @@ import argparse
 import multiprocessing as mp
 import itertools
 
-def idx_bam(bam):
+def idx_bam(bam, threads):
+    threads = str(threads)
     try:
-        pysam.index(bam)
+        pysam.index("-@"+threads,bam)
     except:
         outcome = 'idxerror'
     else:
@@ -19,7 +20,7 @@ def idx_bam(bam):
         print("indexing failed, trying to sort bam file...")
         inbam = bam
         bam = bam+".sorted.bam"
-        pysam.sort("-o", bam, inbam)
+        pysam.sort("-@"+threads,"-o", bam, inbam)
         print("indexing bam file...")
         pysam.index(bam)
     return bam
@@ -47,7 +48,7 @@ def count_ref_consuming_bases(cigartuples):
             bases = bases+cig[1]
     return bases
 
-def clean_bam(inpath, threads, fastapath, chr, strict):
+def clean_bam(inpath, threads, fastapath, chr, strict, keepunmapped, keepsecondary):
     fa = pysam.FastaFile(fastapath)
 
     if chr == '*':
@@ -63,13 +64,17 @@ def clean_bam(inpath, threads, fastapath, chr, strict):
     for read in inp.fetch(chr):
         # deal with unmapped reads
         if chrlabel == 'unmapped':
-            trim_tags = ['uT', 'nM', 'NM']
+            trim_tags = ['uT', 'nM', 'NM', 'XN', 'XM', 'XO', 'XG']
             if strict:
-                trim_tags = trim_tags+['NH','HI','IH','AS','MQ','H1','H2','OA','OC','OP','OQ','SA','SM']
+                trim_tags = trim_tags+['NH','HI','IH','AS','MQ','H1','H2','OA','OC','OP','OQ','SA','SM','XA','XS']
             for t in trim_tags:
                 if read.has_tag(t):
                     read = remove_tag(read, t)
             out.write(read)
+            continue
+
+        #only use primary alignments
+        if not keepsecondary and read.is_secondary:
             continue
 
         #determine some basics
@@ -83,7 +88,7 @@ def clean_bam(inpath, threads, fastapath, chr, strict):
             readtype_int = 1
 
         #modify tags
-        trim_tags = ['MC']
+        trim_tags = ['MC','XN','XM','XO','XG']
         for t in ['NM', 'nM']:
             if read.has_tag(t):
                 read.set_tag(tag = t, value_type = 'I', value = 0)
@@ -101,12 +106,19 @@ def clean_bam(inpath, threads, fastapath, chr, strict):
                 read.set_tag(tag = 'MQ', value_type = 'I', value = readtype_int*readlen)
             if read.has_tag('NH'):
                 read.set_tag(tag = 'NH', value_type = 'I', value = 1)
-            trim_tags = trim_tags+['HI','IH','H1','H2','OA','OC','OP','OQ','SA','SM']
+            trim_tags = trim_tags+['HI','IH','H1','H2','OA','OC','OP','OQ','SA','SM','XA','XS']
             read.mapping_quality = 255
 
         for t in trim_tags:
             if read.has_tag(t):
                 read = remove_tag(read, t)
+
+        #some aligners like to keep the unmapped reads at the same posiiton as their mate, deal with them
+        if read.is_unmapped:
+            if keepunmapped:
+                out.write(read)
+            continue
+
         #look at cigar value
         incigar = read.cigartuples
         present_cigar_types = [x[0] for x in incigar]
@@ -205,13 +217,15 @@ def main():
                         help='Number of processes to use')
     parser.add_argument('--strict', action = 'store_true',
                         help='Strict: also sanitize mapping score & auxiliary tags (eg. AS / NH).')
+    parser.add_argument('--keepsecondary', action = 'store_true',
+                        help='Keep secondary alignments in output bam file.')
     parser.add_argument('--keepunmapped', action = 'store_true',
                         help='Keep ummapped reads in output bam file.')
 
 
     args = parser.parse_args()
 
-    print("anonymizeBAM.py v0.4")
+    print("anonymizeBAM.py v0.4.1")
     bampath = args.bam
     try:
         fa = pysam.FastaFile(args.fa)
@@ -222,7 +236,7 @@ def main():
 
     if not os.path.exists(bampath+'.bai'):
         print("input bam index not found, indexing...")
-        bampath = idx_bam(bampath)
+        bampath = idx_bam(bampath,args.p)
 
     print("Working...")
 
@@ -233,7 +247,7 @@ def main():
         chrs.append('*')
     fa.close()
 
-    if args.p > 8:
+    if args.p > 20:
         pysam_workers = 2
         n_jobs = int(args.p/2)
     else:
@@ -241,7 +255,7 @@ def main():
         n_jobs = args.p
 
     pool = mp.Pool(n_jobs)
-    results = [pool.apply_async(clean_bam, (args.bam,pysam_workers,args.fa,chr,args.strict, )) for chr in chrs]
+    results = [pool.apply_async(clean_bam, (args.bam,pysam_workers,args.fa,chr,args.strict,args.keepunmapped,args.keepsecondary,  )) for chr in chrs]
     x = [r.get() for r in results]
     #single threaded below:
     #[clean_bam(bampath,pysam_workers,args.fa,chr,args.strict) for chr in chrs]
@@ -249,7 +263,7 @@ def main():
     print("Creating final output .bam file...")
     collect_bam_chunks(inpath = bampath, chrs = chrs, outpath = args.out, unmapped = args.keepunmapped)
     print("Indexing final output .bam file...")
-    pysam.index(args.out)
+    y = idx_bam(args.out,args.p)
 
     print("Done!")
 
