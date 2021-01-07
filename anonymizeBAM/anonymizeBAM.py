@@ -208,11 +208,11 @@ def clean_bam(inpath, threads, fastapath, chr, strict, keepunmapped, keepseconda
 def main():
     parser = argparse.ArgumentParser(add_help=True)
     parser.add_argument('--bam', type=str, metavar='FILENAME',
-                        help='Path to input BAM file')
+                        help='Path to input BAM file', required = True)
     parser.add_argument('--out', type=str, metavar='FILENAME',
-                        help='Path to output bam file')
+                        help='Path to output bam file', required = True)
     parser.add_argument('--fa', type=str, metavar='FILENAME',
-                        help='Path to genome reference fasta')
+                        help='Path to genome reference fasta', required = True)
     parser.add_argument('--p', type=int, default = 10,
                         help='Number of processes to use')
     parser.add_argument('--strict', action = 'store_true',
@@ -225,7 +225,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("anonymizeBAM.py v0.4.1")
+    print("anonymizeBAM.py v0.4.2")
     bampath = args.bam
     try:
         fa = pysam.FastaFile(args.fa)

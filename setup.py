@@ -18,9 +18,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/sandberg-lab/dataprivacy",
     packages=setuptools.find_packages(),
+    entry_points={
+        'console_scripts': [
+            'anonymizeBAM = anonymizeBAM.anonymizeBAM:main',
+            ],
+        },
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3.0"
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
     ],
     python_requires='>=3.6',
     license='GPL-3.0-or-later'

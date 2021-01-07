@@ -21,7 +21,7 @@ Your fasta file should be indexed (`samtools faidx`).
 The .bam file should be coordinate sorted and indexed, however `anonymizeBAM.py` will try to do this for you if not.
 
 
-    usage: anonymizeBAM.py [-h] [--bam FILENAME] [--out FILENAME] [--fa FILENAME]
+    usage: anonymizeBAM [-h] [--bam FILENAME] [--out FILENAME] [--fa FILENAME]
                             [--p P] [--strict] [--keepsecondary] [--keepunmapped]
 
     optional arguments:
