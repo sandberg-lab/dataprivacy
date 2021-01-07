@@ -56,6 +56,7 @@ Donor-related information could also be inferred from standard bam fields and au
  2. MD are matched to the anonymized sequence, if present (eg. 100) .
  3. NM and nM tags are sanitized by replacement with 1.
  4. Tags containing information on the alignment are discarded (MC, XN, XM, XO, XG)
+ 
 In `--strict` mode, the following tags are also changed:
  5. Mapping quality set to max/unavailable (255)
  6. AS and MQ are set to read length
