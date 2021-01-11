@@ -1,4 +1,6 @@
 ## Changelog for releases
+### 11.01.2021: v0.4.3
+Added `@PG` header line to mark output .bam files with the anonymizeBAM call.
 ### 07.01.2021: v0.4.2
 Changes for upload to PyPI
 ### 06.01.2021: v0.4.1

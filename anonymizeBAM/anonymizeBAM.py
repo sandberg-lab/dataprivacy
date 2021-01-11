@@ -1,12 +1,38 @@
 # anonymize_bam.py - de-identify sequencing data
 # Author: Christoph Ziegenhain / christoph.ziegenhain@ki.se
-# Last update: 05-01-2021
+# Last update: 11-01-2021
 
 import os
 import pysam
 import argparse
 import multiprocessing as mp
 import itertools
+from version import __version__ as v
+
+def makeBAMheader(args, v):
+    bam = pysam.AlignmentFile(args.bam, 'rb')
+    hdr = bam.header.to_dict()
+    bam.close()
+
+    cmdlinecall = 'anonymizeBAM --bam '+args.bam+' --out '+args.out+' --fa '+args.fa+' --p '+str(args.p)
+    if args.strict:
+        cmdlinecall = cmdlinecall+' --strict'
+    if args.keepunmapped:
+        cmdlinecall = cmdlinecall+' --keepunmapped'
+    if args.keepsecondary:
+        cmdlinecall = cmdlinecall+' --keepsecondary'
+
+    pg = {'ID': 'anonymizeBAM', 'PN': 'anonymizeBAM',
+          'CL': cmdlinecall, 'VN': v}
+
+    if 'PG' in hdr:
+        pglines = hdr['PG']
+        pglines.append(pg)
+    else:
+        pglines = [pg]
+    hdr['PG'] = pglines
+
+    return hdr
 
 def idx_bam(bam, threads):
     threads = str(threads)
@@ -48,7 +74,7 @@ def count_ref_consuming_bases(cigartuples):
             bases = bases+cig[1]
     return bases
 
-def clean_bam(inpath, threads, fastapath, chr, strict, keepunmapped, keepsecondary):
+def clean_bam(inpath, threads, fastapath, chr, strict, keepunmapped, keepsecondary, anonheader):
     fa = pysam.FastaFile(fastapath)
 
     if chr == '*':
@@ -60,7 +86,7 @@ def clean_bam(inpath, threads, fastapath, chr, strict, keepunmapped, keepseconda
     outpath = inpath+".tmp."+chrlabel+".bam"
     tmppath = inpath+".tmp."+chrlabel+".tmp.bam"
     inp = pysam.AlignmentFile(inpath, 'rb', threads = threads)
-    out = pysam.AlignmentFile(tmppath, 'wb', template = inp, threads = threads)
+    out = pysam.AlignmentFile(tmppath, 'wb', header = anonheader, threads = threads)
     for read in inp.fetch(chr):
         # deal with unmapped reads
         if chrlabel == 'unmapped':
@@ -225,7 +251,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("anonymizeBAM.py v0.4.2")
+    print("anonymizeBAM.py v"+v)
     bampath = args.bam
     try:
         fa = pysam.FastaFile(args.fa)
@@ -238,6 +264,8 @@ def main():
         print("input bam index not found, indexing...")
         bampath = idx_bam(bampath,args.p)
 
+    #Construct the new bam header to work with
+    bamheader = makeBAMheader(args, v)
     print("Working...")
 
     chrs = pysam.idxstats(bampath).split('\n')
@@ -255,7 +283,7 @@ def main():
         n_jobs = args.p
 
     pool = mp.Pool(n_jobs)
-    results = [pool.apply_async(clean_bam, (args.bam,pysam_workers,args.fa,chr,args.strict,args.keepunmapped,args.keepsecondary,  )) for chr in chrs]
+    results = [pool.apply_async(clean_bam, (args.bam,pysam_workers,args.fa,chr,args.strict,args.keepunmapped,args.keepsecondary,bamheader,  )) for chr in chrs]
     x = [r.get() for r in results]
     #single threaded below:
     #[clean_bam(bampath,pysam_workers,args.fa,chr,args.strict) for chr in chrs]

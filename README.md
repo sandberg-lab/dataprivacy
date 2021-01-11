@@ -2,7 +2,7 @@
 
 ## anonymizeBAM.py: de-identification of sequencing reads
 
-**anonymizeBAM.py** is a tool that can sanitize sequencing reads stored in BAM file format to protect the privacy and genetic information of donor individuals.
+**anonymizeBAM.py** is a tool that can anonymize sequencing reads stored in BAM file format to protect the privacy and genetic information of donor individuals.
 
 ## Installation
 
@@ -65,6 +65,7 @@ In `--strict` mode, the following tags are also changed:
  8. Discarding of the following tags: HI, IH, H1, H2, OA, OC, OP, OQ, SA, SM, XA, XS
 
 
+The output bam file also will contain a `@PG` line reflecting the invoked command line call.
 
 ## Reference
 
