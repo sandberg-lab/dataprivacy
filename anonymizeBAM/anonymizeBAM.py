@@ -7,7 +7,6 @@ import pysam
 import argparse
 import multiprocessing as mp
 import itertools
-from version import __version__ as v
 
 def makeBAMheader(args, v):
     bam = pysam.AlignmentFile(args.bam, 'rb')
@@ -250,7 +249,7 @@ def main():
 
 
     args = parser.parse_args()
-
+    v = '0.4.4'
     print("anonymizeBAM.py v"+v)
     bampath = args.bam
     try:
