@@ -18,6 +18,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/sandberg-lab/dataprivacy",
     packages=setuptools.find_packages(),
+    install_requires= ['pysam>=0.14.0'],
     entry_points={
         'console_scripts': [
             'anonymizeBAM = anonymizeBAM.anonymizeBAM:main',

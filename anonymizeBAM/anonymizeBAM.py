@@ -249,7 +249,7 @@ def main():
 
 
     args = parser.parse_args()
-    v = '0.4.4'
+    v = '0.4.5'
     print("anonymizeBAM.py v"+v)
     bampath = args.bam
     try:

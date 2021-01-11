@@ -1,4 +1,6 @@
 ## Changelog for releases
+### 11.01.2021: v0.4.5
+Add correct installation dependencies.
 ### 11.01.2021: v0.4.4
 Fix version verbose.
 ### 11.01.2021: v0.4.3
