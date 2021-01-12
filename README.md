@@ -69,4 +69,13 @@ The output bam file also will contain a `@PG` line reflecting the invoked comman
 
 ## Reference
 
-[link to follow]
+https://www.biorxiv.org/content/10.1101/2021.01.11.426206v1
+
+
+## FAQ
+
+> Help! I am getting the following error message:
+> ERROR: Could not find a version that satisfies the requirement anonymizeBAM (from versions: none)
+ERROR: No matching distribution found for anonymizeBAM
+
+Make sure that you are using pip from a python3 installation! Try `pip3 install anonymizeBAM` instead.
