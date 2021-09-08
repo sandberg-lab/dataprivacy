@@ -1,4 +1,4 @@
-# anonymize_bam.py - de-identify sequencing data
+# BAMboozle.py - de-identify sequencing data
 # Author: Christoph Ziegenhain / christoph.ziegenhain@ki.se
 # Last update: 11-01-2021
 
@@ -13,7 +13,7 @@ def makeBAMheader(args, v):
     hdr = bam.header.to_dict()
     bam.close()
 
-    cmdlinecall = 'anonymizeBAM --bam '+args.bam+' --out '+args.out+' --fa '+args.fa+' --p '+str(args.p)
+    cmdlinecall = 'BAMboozle --bam '+args.bam+' --out '+args.out+' --fa '+args.fa+' --p '+str(args.p)
     if args.strict:
         cmdlinecall = cmdlinecall+' --strict'
     if args.keepunmapped:
@@ -21,7 +21,7 @@ def makeBAMheader(args, v):
     if args.keepsecondary:
         cmdlinecall = cmdlinecall+' --keepsecondary'
 
-    pg = {'ID': 'anonymizeBAM', 'PN': 'anonymizeBAM',
+    pg = {'ID': 'BAMboozle', 'PN': 'BAMboozle',
           'CL': cmdlinecall, 'VN': v}
 
     if 'PG' in hdr:
@@ -249,8 +249,8 @@ def main():
 
 
     args = parser.parse_args()
-    v = '0.4.5'
-    print("anonymizeBAM.py v"+v)
+    v = '0.5.0'
+    print("BAMboozle.py v"+v)
     bampath = args.bam
     try:
         fa = pysam.FastaFile(args.fa)

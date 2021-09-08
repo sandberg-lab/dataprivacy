@@ -1,4 +1,6 @@
 ## Changelog for releases
+### 08.09.2021: v0.5.0
+Name change from anonymizeBAM to BAMboozle.
 ### 11.01.2021: v0.4.5
 Add correct installation dependencies.
 ### 11.01.2021: v0.4.4

@@ -1,13 +1,13 @@
 
 
-## anonymizeBAM.py: de-identification of sequencing reads
+## BAMboozle.py: de-identification of sequencing reads
 
-**anonymizeBAM.py** is a tool that can anonymize sequencing reads stored in BAM file format to protect the privacy and genetic information of donor individuals.
+**BAMboozle.py** is a tool that can remove genetic variation from sequencing reads stored in BAM file format to protect the privacy and genetic information of donor individuals.
 
 ## Installation
 
-anonymizeBAM.py is available through PyPI. To install, type the following command line, and add `-U` for upgrading:
-`pip install anonymizeBAM`
+BAMboozle.py is available through PyPI. To install, type the following command line, and add `-U` for upgrading:
+`pip install BAMboozle`
 
 Alternatively, you can install from this GitHub repository for the latest version:
 `pip install git+https://github.com/sandberg-lab/dataprivacy`
@@ -16,12 +16,12 @@ Add `--user` if you don't have write permissions in your default python folder.
 
 ## Usage
 
-anonymizeBAM.py requires only an aligned .bam file and the reference genome in fasta format.
+BAMboozle.py requires only an aligned .bam file and the reference genome in fasta format.
 Your fasta file should be indexed (`samtools faidx`).
-The .bam file should be coordinate sorted and indexed, however `anonymizeBAM.py` will try to do this for you if not.
+The .bam file should be coordinate sorted and indexed, however `BAMboozle.py` will try to do this for you if not.
 
 
-    usage: anonymizeBAM [-h] [--bam FILENAME] [--out FILENAME] [--fa FILENAME]
+    usage: BAMboozle [-h] [--bam FILENAME] [--out FILENAME] [--fa FILENAME]
                             [--p P] [--strict] [--keepsecondary] [--keepunmapped]
 
     optional arguments:
@@ -36,9 +36,9 @@ The .bam file should be coordinate sorted and indexed, however `anonymizeBAM.py`
 
 ## Description
 
-**anonymizeBAM** sanitizes sequence reads to provide privacy protection and facilitate data sharing.
+**BAMboozle** sanitizes sequence reads to provide privacy protection and facilitate data sharing.
 
-The anonymization procedure involves modification of the observed read sequence to the reference genome sequence and sanitation of auxiliary tags.
+The BAMboozle procedure involves modification of the observed read sequence to the reference genome sequence and sanitation of auxiliary tags.
 
 Here is an overview of the sequence correction strategy:
 
@@ -52,8 +52,8 @@ Here is an overview of the sequence correction strategy:
 
 Donor-related information could also be inferred from standard bam fields and auxiliary tags:
 
- 1. CIGAR value is matched to the anonymized sequence (eg. 100M).
- 2. MD are matched to the anonymized sequence, if present (eg. 100) .
+ 1. CIGAR value is matched to the BAMboozled sequence (eg. 100M).
+ 2. MD are matched to the BAMboozled sequence, if present (eg. 100) .
  3. NM and nM tags are sanitized by replacement with 1.
  4. Tags containing information on the alignment are discarded (MC, XN, XM, XO, XG)
 
@@ -75,7 +75,7 @@ https://www.biorxiv.org/content/10.1101/2021.01.11.426206v1
 ## FAQ
 
 > Help! I am getting the following error message:
-> ERROR: Could not find a version that satisfies the requirement anonymizeBAM (from versions: none)
-ERROR: No matching distribution found for anonymizeBAM
+> ERROR: Could not find a version that satisfies the requirement BAMboozle (from versions: none)
+ERROR: No matching distribution found for BAMboozle
 
-Make sure that you are using pip from a python3 installation! Try `pip3 install anonymizeBAM` instead.
+Make sure that you are using pip from a python3 installation! Try `pip3 install BAMboozle` instead.
