@@ -68,8 +68,8 @@ In `--strict` mode, the following tags are also changed:
 The output bam file also will contain a `@PG` line reflecting the invoked command line call.
 
 ## Reference
-
-https://www.biorxiv.org/content/10.1101/2021.01.11.426206v1
+Ziegenhain, C., Sandberg, R. BAMboozle removes genetic variation from human sequence data for open data sharing. Nat Commun 12, 6216 (2021). https://doi.org/10.1038/s41467-021-26152-8
+https://www.nature.com/articles/s41467-021-26152-8
 
 
 ## FAQ
